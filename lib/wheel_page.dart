@@ -5,23 +5,32 @@ import 'package:glueksrad/wheel/wheel_of_fortune.dart';
 import 'wheel_edit_page.dart';
 
 class WheelPage extends StatefulWidget {
-  const WheelPage({super.key, required this.config, this.onEdited});
+  const WheelPage({
+    super.key,
+    required this.config,
+    this.onEdited,
+    this.initResults = const [],
+    this.saveResults,
+  });
 
   final WheelConfig config;
   final Function(WheelConfig config)? onEdited;
+  final List<int> initResults;
+  final Function(List<int> results)? saveResults;
 
   @override
   State<WheelPage> createState() => _WheelPageState();
 }
 
 class _WheelPageState extends State<WheelPage> {
-  final List<int> results = [];
+  List<int> results = [];
 
   late WheelConfig config;
 
   @override
   void initState() {
     config = widget.config;
+    results = widget.initResults.toList();
     super.initState();
   }
 
@@ -29,6 +38,7 @@ class _WheelPageState extends State<WheelPage> {
   void didUpdateWidget(covariant WheelPage oldWidget) {
     if (oldWidget.config != widget.config) {
       config = widget.config;
+      results = widget.initResults.toList();
     }
     super.didUpdateWidget(oldWidget);
   }
@@ -69,10 +79,12 @@ class _WheelPageState extends State<WheelPage> {
                     setState(() {
                       config = result;
                       results.clear();
+                      widget.saveResults?.call(results);
                     });
                   } else {
                     config = result;
                     results.clear();
+                    widget.saveResults?.call(results);
                   }
                 }
               },
@@ -124,9 +136,15 @@ class _WheelPageState extends State<WheelPage> {
                 child: WheelOfFortune(
                   config: config,
                   onResult: (event, eventId, section) {
-                    setState(() {
+                    if (mounted) {
+                      setState(() {
+                        results.add(eventId);
+                        widget.saveResults?.call(results);
+                      });
+                    } else {
                       results.add(eventId);
-                    });
+                      widget.saveResults?.call(results);
+                    }
                   },
                 ),
               ),

@@ -4,11 +4,14 @@ import 'dart:convert';
 import 'package:download/download.dart';
 import 'package:flutter/material.dart';
 import 'package:glueksrad/wheel/wheel_of_fortune.dart';
+import 'package:glueksrad/wheel_edit_page.dart';
 import 'package:http/http.dart' as http;
 
 import 'wheel/page_config.dart';
 import 'wheel/wheel_config.dart';
 import 'wheel_page.dart';
+
+const initSpinDuration = Duration(seconds: 3);
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -20,7 +23,9 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> {
   late final bool isTeacher;
   PageConfig? __pageConfig;
+  final List<List<int>> wheelResults = [];
   final List<WheelConfig> customWheels = [];
+  final List<List<int>> customWheelsResults = [];
   Object? error;
 
   PageConfig? get _pageConfig => __pageConfig;
@@ -109,6 +114,10 @@ class _MainPageState extends State<MainPage> {
                                         );
                                       }
                                     : null,
+                                initResults: wheelResults[i],
+                                saveResults: (results) {
+                                  wheelResults[i] = results;
+                                },
                               ),
                             ),
                           );
@@ -125,24 +134,25 @@ class _MainPageState extends State<MainPage> {
                       Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: FloatingActionButton(
-                          onPressed: () {
-                            Navigator.push(
+                          onPressed: () async {
+                            final result = await Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => WheelPage(
+                                builder: (context) => WheelEditPage(
                                   config: WheelConfig(
                                     events: [],
                                     sections: [],
-                                    spinDuration: const Duration(seconds: 5),
+                                    spinDuration: initSpinDuration,
                                   ),
-                                  onEdited: (config) {
-                                    _pageConfig = data.copyWith(
-                                      wheels: [...data.wheels, config],
-                                    );
-                                  },
                                 ),
                               ),
                             );
+                            if (result != null) {
+                              _pageConfig = data.copyWith(
+                                wheels: [...data.wheels, result],
+                              );
+                              wheelResults.add([]);
+                            }
                           },
                           child: Icon(Icons.add),
                         ),
@@ -179,6 +189,10 @@ class _MainPageState extends State<MainPage> {
                                       customWheels[i] = config;
                                     });
                                   },
+                                  initResults: customWheelsResults[i],
+                                  saveResults: (results) {
+                                    customWheelsResults[i] = results;
+                                  },
                                 ),
                               ),
                             );
@@ -198,24 +212,26 @@ class _MainPageState extends State<MainPage> {
                         padding: const EdgeInsets.all(8.0),
                         child: FloatingActionButton(
                           child: const Icon(Icons.add),
-                          onPressed: () {
-                            Navigator.push(
+                          onPressed: () async {
+                            final result = await Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => WheelPage(
+                                builder: (context) => WheelEditPage(
                                   config: WheelConfig(
                                     events: [],
                                     sections: [],
-                                    spinDuration: const Duration(seconds: 5),
+                                    spinDuration: initSpinDuration,
                                   ),
-                                  onEdited: (config) {
-                                    setState(() {
-                                      customWheels.add(config);
-                                    });
-                                  },
                                 ),
                               ),
                             );
+
+                            if (result != null) {
+                              setState(() {
+                                customWheels.add(result);
+                                customWheelsResults.add([]);
+                              });
+                            }
                           },
                         ),
                       ),
