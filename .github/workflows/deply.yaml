@@ -5,6 +5,10 @@ on:
       - main
   # release:
   #   types: [published]
+
+permissions:
+  contents: write
+
 jobs:
   web:
     concurrency: web-${{ github.ref }}
