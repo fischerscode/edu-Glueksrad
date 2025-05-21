@@ -52,6 +52,9 @@ class _MainPageState extends State<MainPage> {
         if (response.statusCode == 200) {
           final config = PageConfig.fromJson(jsonDecode(response.body));
           _pageConfig = config;
+          wheelResults.addAll(
+            List.generate(config.wheels.length, (index) => []),
+          );
         } else {
           error = 'Failed to load config';
         }
