@@ -13,10 +13,17 @@ _WheelConfig _$WheelConfigFromJson(Map<String, dynamic> json) => _WheelConfig(
   sections: (json['sections'] as List<dynamic>)
       .map((e) => Section.fromJson(e as Map<String, dynamic>))
       .toList(),
+  spinDuration: const DurationConverter().fromJson(
+    (json['spinDuration'] as num).toInt(),
+  ),
 );
 
 Map<String, dynamic> _$WheelConfigToJson(_WheelConfig instance) =>
-    <String, dynamic>{'events': instance.events, 'sections': instance.sections};
+    <String, dynamic>{
+      'events': instance.events,
+      'sections': instance.sections,
+      'spinDuration': const DurationConverter().toJson(instance.spinDuration),
+    };
 
 _Event _$EventFromJson(Map<String, dynamic> json) => _Event(
   name: json['name'] as String,

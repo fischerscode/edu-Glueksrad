@@ -16,7 +16,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$WheelConfig {
 
- List<Event> get events; List<Section> get sections;
+ List<Event> get events; List<Section> get sections;@DurationConverter() Duration get spinDuration;
 /// Create a copy of WheelConfig
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -29,16 +29,16 @@ $WheelConfigCopyWith<WheelConfig> get copyWith => _$WheelConfigCopyWithImpl<Whee
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is WheelConfig&&const DeepCollectionEquality().equals(other.events, events)&&const DeepCollectionEquality().equals(other.sections, sections));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is WheelConfig&&const DeepCollectionEquality().equals(other.events, events)&&const DeepCollectionEquality().equals(other.sections, sections)&&(identical(other.spinDuration, spinDuration) || other.spinDuration == spinDuration));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(events),const DeepCollectionEquality().hash(sections));
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(events),const DeepCollectionEquality().hash(sections),spinDuration);
 
 @override
 String toString() {
-  return 'WheelConfig(events: $events, sections: $sections)';
+  return 'WheelConfig(events: $events, sections: $sections, spinDuration: $spinDuration)';
 }
 
 
@@ -49,7 +49,7 @@ abstract mixin class $WheelConfigCopyWith<$Res>  {
   factory $WheelConfigCopyWith(WheelConfig value, $Res Function(WheelConfig) _then) = _$WheelConfigCopyWithImpl;
 @useResult
 $Res call({
- List<Event> events, List<Section> sections
+ List<Event> events, List<Section> sections,@DurationConverter() Duration spinDuration
 });
 
 
@@ -66,11 +66,12 @@ class _$WheelConfigCopyWithImpl<$Res>
 
 /// Create a copy of WheelConfig
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? events = null,Object? sections = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? events = null,Object? sections = null,Object? spinDuration = null,}) {
   return _then(_self.copyWith(
 events: null == events ? _self.events : events // ignore: cast_nullable_to_non_nullable
 as List<Event>,sections: null == sections ? _self.sections : sections // ignore: cast_nullable_to_non_nullable
-as List<Section>,
+as List<Section>,spinDuration: null == spinDuration ? _self.spinDuration : spinDuration // ignore: cast_nullable_to_non_nullable
+as Duration,
   ));
 }
 
@@ -81,7 +82,7 @@ as List<Section>,
 @JsonSerializable()
 
 class _WheelConfig extends WheelConfig {
-  const _WheelConfig({required final  List<Event> events, required final  List<Section> sections}): _events = events,_sections = sections,super._();
+  const _WheelConfig({required final  List<Event> events, required final  List<Section> sections, @DurationConverter() required this.spinDuration}): _events = events,_sections = sections,super._();
   factory _WheelConfig.fromJson(Map<String, dynamic> json) => _$WheelConfigFromJson(json);
 
  final  List<Event> _events;
@@ -98,6 +99,7 @@ class _WheelConfig extends WheelConfig {
   return EqualUnmodifiableListView(_sections);
 }
 
+@override@DurationConverter() final  Duration spinDuration;
 
 /// Create a copy of WheelConfig
 /// with the given fields replaced by the non-null parameter values.
@@ -112,16 +114,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _WheelConfig&&const DeepCollectionEquality().equals(other._events, _events)&&const DeepCollectionEquality().equals(other._sections, _sections));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _WheelConfig&&const DeepCollectionEquality().equals(other._events, _events)&&const DeepCollectionEquality().equals(other._sections, _sections)&&(identical(other.spinDuration, spinDuration) || other.spinDuration == spinDuration));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_events),const DeepCollectionEquality().hash(_sections));
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_events),const DeepCollectionEquality().hash(_sections),spinDuration);
 
 @override
 String toString() {
-  return 'WheelConfig(events: $events, sections: $sections)';
+  return 'WheelConfig(events: $events, sections: $sections, spinDuration: $spinDuration)';
 }
 
 
@@ -132,7 +134,7 @@ abstract mixin class _$WheelConfigCopyWith<$Res> implements $WheelConfigCopyWith
   factory _$WheelConfigCopyWith(_WheelConfig value, $Res Function(_WheelConfig) _then) = __$WheelConfigCopyWithImpl;
 @override @useResult
 $Res call({
- List<Event> events, List<Section> sections
+ List<Event> events, List<Section> sections,@DurationConverter() Duration spinDuration
 });
 
 
@@ -149,11 +151,12 @@ class __$WheelConfigCopyWithImpl<$Res>
 
 /// Create a copy of WheelConfig
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? events = null,Object? sections = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? events = null,Object? sections = null,Object? spinDuration = null,}) {
   return _then(_WheelConfig(
 events: null == events ? _self._events : events // ignore: cast_nullable_to_non_nullable
 as List<Event>,sections: null == sections ? _self._sections : sections // ignore: cast_nullable_to_non_nullable
-as List<Section>,
+as List<Section>,spinDuration: null == spinDuration ? _self.spinDuration : spinDuration // ignore: cast_nullable_to_non_nullable
+as Duration,
   ));
 }
 

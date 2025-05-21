@@ -1,5 +1,4 @@
-import 'dart:ui';
-
+import 'package:flutter/widgets.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'wheel_config.freezed.dart';
@@ -12,6 +11,7 @@ abstract class WheelConfig with _$WheelConfig {
   const factory WheelConfig({
     required List<Event> events,
     required List<Section> sections,
+    @DurationConverter() required Duration spinDuration,
   }) = _WheelConfig;
 
   factory WheelConfig.fromJson(Map<String, Object?> json) =>
@@ -51,5 +51,19 @@ class ColorConverter implements JsonConverter<Color, int> {
   @override
   int toJson(Color color) {
     return color.toARGB32();
+  }
+}
+
+class DurationConverter implements JsonConverter<Duration, int> {
+  const DurationConverter();
+
+  @override
+  Duration fromJson(int json) {
+    return Duration(milliseconds: json);
+  }
+
+  @override
+  int toJson(Duration duration) {
+    return duration.inMilliseconds;
   }
 }

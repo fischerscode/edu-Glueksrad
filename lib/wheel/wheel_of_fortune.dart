@@ -6,7 +6,7 @@ import 'package:glueksrad/wheel/wheel_config.dart';
 class WheelOfFortune extends StatefulWidget {
   final WheelConfig config;
 
-  final void Function(Event event, int section) onResult;
+  final void Function(Event event, int eventId, int section) onResult;
 
   const WheelOfFortune({
     super.key,
@@ -28,10 +28,7 @@ class _WheelOfFortuneState extends State<WheelOfFortune>
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 5),
-    );
+    _controller = AnimationController(vsync: this);
     _animation =
         Tween<double>(begin: 0, end: 0).animate(
             CurvedAnimation(parent: _controller, curve: Curves.decelerate),
@@ -56,17 +53,18 @@ class _WheelOfFortuneState extends State<WheelOfFortune>
       end: _currentAngle + randomSpin,
     ).animate(CurvedAnimation(parent: _controller, curve: Curves.decelerate));
     _controller
+      ..duration = widget.config.spinDuration
       ..reset()
       ..forward();
   }
 
   /// Determine which segment the wheel stopped on.
   void _calculateResult() {
-    final (Event event, int section) = WheelPaint.calculateResult(
+    final (Event event, int eventId, int section) = WheelPaint.calculateResult(
       _currentAngle,
       widget.config,
     );
-    widget.onResult(event, section);
+    widget.onResult(event, eventId, section);
   }
 
   @override
@@ -95,7 +93,7 @@ class WheelPaint extends StatelessWidget {
     return CustomPaint(painter: _WheelPainter(config, angle));
   }
 
-  static (Event event, int section) calculateResult(
+  static (Event event, int eventId, int section) calculateResult(
     double angle,
     WheelConfig config,
   ) {
@@ -105,17 +103,21 @@ class WheelPaint extends StatelessWidget {
 
     for (int i = 0; i < segments.length; i++) {
       if (normaized >= segments[i].start && normaized < segments[i].end) {
-        return (segments[i].event, i);
+        return (segments[i].event, segments[i].eventId, i);
       }
     }
     assert(false, 'No segment found for angle: $angle');
-    return (config.events[config.sections[0].eventId], 0);
+    return (
+      config.events[config.sections[0].eventId],
+      config.sections[0].eventId,
+      0,
+    );
   }
 
-  static List<({double start, double end, Event event})> calculateSegments(
-    WheelConfig config,
-  ) {
-    final List<({double start, double end, Event event})> segments = [];
+  static List<({double start, double end, Event event, int eventId})>
+  calculateSegments(WheelConfig config) {
+    final List<({double start, double end, Event event, int eventId})>
+    segments = [];
 
     final int totalSize = config.totalSize;
     final List<double> segmentSizes = config.sections
@@ -129,6 +131,7 @@ class WheelPaint extends StatelessWidget {
         start: start,
         end: start + segmentSizes[i],
         event: config.events[config.sections[i].eventId],
+        eventId: config.sections[i].eventId,
       ));
 
       start += segmentSizes[i];
