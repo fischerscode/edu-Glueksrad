@@ -107,6 +107,7 @@ class _MainPageState extends State<MainPage> {
                               MaterialPageRoute(
                                 builder: (context) => WheelPage(
                                   config: data.wheels[i],
+                                  heroTag: 'wheel${i}',
                                   onEdited: isTeacher
                                       ? (config) {
                                           _pageConfig = data.copyWith(
@@ -125,11 +126,14 @@ class _MainPageState extends State<MainPage> {
                           },
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
-                            child: SizedBox.square(
-                              dimension: 200,
-                              child: WheelPaint(
-                                config: data.wheels[i],
-                                angle: 0,
+                            child: Hero(
+                              tag: 'wheel${i}',
+                              child: SizedBox.square(
+                                dimension: 200,
+                                child: WheelPaint(
+                                  config: data.wheels[i],
+                                  angle: 0,
+                                ),
                               ),
                             ),
                           ),
@@ -143,6 +147,7 @@ class _MainPageState extends State<MainPage> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => WheelEditPage(
+                                    heroTag: 'wheel${data.wheels.length}',
                                     config: WheelConfig(
                                       events: [],
                                       sections: [],
@@ -195,6 +200,7 @@ class _MainPageState extends State<MainPage> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => WheelPage(
+                                    heroTag: 'customWheel${i}',
                                     config: customWheels[i],
                                     onEdited: (config) {
                                       setState(() {
@@ -209,13 +215,16 @@ class _MainPageState extends State<MainPage> {
                                 ),
                               );
                             },
-                            child: SizedBox.square(
-                              dimension: 150,
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: WheelPaint(
-                                  config: customWheels[i],
-                                  angle: 0,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Hero(
+                                tag: 'customWheel${i}',
+                                child: SizedBox.square(
+                                  dimension: 150,
+                                  child: WheelPaint(
+                                    config: customWheels[i],
+                                    angle: 0,
+                                  ),
                                 ),
                               ),
                             ),
@@ -229,6 +238,8 @@ class _MainPageState extends State<MainPage> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => WheelEditPage(
+                                    heroTag:
+                                        'customWheel${customWheels.length}',
                                     config: WheelConfig(
                                       events: [],
                                       sections: [],

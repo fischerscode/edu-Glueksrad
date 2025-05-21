@@ -2,13 +2,15 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:glueksrad/utils/maybe_hero.dart';
 import 'package:glueksrad/wheel/wheel_config.dart';
 import 'package:glueksrad/wheel/wheel_of_fortune.dart';
 
 class WheelEditPage extends StatefulWidget {
-  const WheelEditPage({super.key, required this.config});
+  const WheelEditPage({super.key, required this.config, this.heroTag});
 
   final WheelConfig config;
+  final String? heroTag;
 
   @override
   State<WheelEditPage> createState() => _WheelEditPageState();
@@ -91,20 +93,22 @@ class _WheelEditPageState extends State<WheelEditPage> {
               Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  SizedBox.square(
-                    dimension: 300,
-                    child: WheelPaint(
-                      selectedSection: _selectedSection,
-                      config: _builder.build(),
-                      angle: 0,
-                      onSectionPressed: (section) {
-                        setState(() {
-                          _selectedSection = section;
-                          nameEditingController.text = _builder.getSectionName(
-                            section,
-                          );
-                        });
-                      },
+                  maybeHero(
+                    heroTag: widget.heroTag,
+                    child: SizedBox.square(
+                      dimension: 300,
+                      child: WheelPaint(
+                        selectedSection: _selectedSection,
+                        config: _builder.build(),
+                        angle: 0,
+                        onSectionPressed: (section) {
+                          setState(() {
+                            _selectedSection = section;
+                            nameEditingController.text = _builder
+                                .getSectionName(section);
+                          });
+                        },
+                      ),
                     ),
                   ),
                   Container(
