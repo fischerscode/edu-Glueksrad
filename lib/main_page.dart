@@ -116,7 +116,7 @@ class _MainPageState extends State<MainPage> {
                                     : null,
                                 initResults: wheelResults[i],
                                 saveResults: (results) {
-                                  wheelResults[i] = results;
+                                  wheelResults[i] = results.toList();
                                 },
                               ),
                             ),
@@ -191,7 +191,7 @@ class _MainPageState extends State<MainPage> {
                                   },
                                   initResults: customWheelsResults[i],
                                   saveResults: (results) {
-                                    customWheelsResults[i] = results;
+                                    customWheelsResults[i] = results.toList();
                                   },
                                 ),
                               ),

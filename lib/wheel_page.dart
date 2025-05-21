@@ -92,6 +92,7 @@ class _WheelPageState extends State<WheelPage> {
         ],
       ),
       body: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           IntrinsicWidth(
             child: Column(
@@ -118,35 +119,42 @@ class _WheelPageState extends State<WheelPage> {
                       ),
                     ],
                   ),
+                IconButton(
+                  onPressed: () {
+                    setState(() {
+                      results.clear();
+                      widget.saveResults?.call(results);
+                    });
+                  },
+                  icon: Icon(Icons.restart_alt_rounded),
+                ),
               ],
             ),
           ),
-          Expanded(
-            child: Center(
-              child: SizedBox(
-                width: 300,
-                height: 300,
-                // child: WheelPaint(
-                //   config: config,
-                //   angle: 1,
-                //   onSectionPressed: (section) {
-                //     print(config.events[config.sections[section].eventId].name);
-                //   },
-                // ),
-                child: WheelOfFortune(
-                  config: config,
-                  onResult: (event, eventId, section) {
-                    if (mounted) {
-                      setState(() {
-                        results.add(eventId);
-                        widget.saveResults?.call(results);
-                      });
-                    } else {
+          Center(
+            child: SizedBox(
+              width: 300,
+              height: 300,
+              // child: WheelPaint(
+              //   config: config,
+              //   angle: 1,
+              //   onSectionPressed: (section) {
+              //     print(config.events[config.sections[section].eventId].name);
+              //   },
+              // ),
+              child: WheelOfFortune(
+                config: config,
+                onResult: (event, eventId, section) {
+                  if (mounted) {
+                    setState(() {
                       results.add(eventId);
                       widget.saveResults?.call(results);
-                    }
-                  },
-                ),
+                    });
+                  } else {
+                    results.add(eventId);
+                    widget.saveResults?.call(results);
+                  }
+                },
               ),
             ),
           ),
