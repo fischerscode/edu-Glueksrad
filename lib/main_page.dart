@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:download/download.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:glueksrad/wheel/wheel_of_fortune.dart';
 import 'package:http/http.dart' as http;
@@ -105,9 +104,10 @@ class _MainPageState extends State<MainPage> {
                                   config: data.wheels[i],
                                   onEdited: isTeacher
                                       ? (config) {
-                                          setState(() {
-                                            data.wheels[i] = config;
-                                          });
+                                          _pageConfig = data.copyWith(
+                                            wheels: data.wheels.toList()
+                                              ..[i] = config,
+                                          );
                                         }
                                       : null,
                                 ),
@@ -141,11 +141,9 @@ class _MainPageState extends State<MainPage> {
                                     spinDuration: const Duration(seconds: 5),
                                   ),
                                   onEdited: (config) {
-                                    final newConfig = PageConfig(
+                                    _pageConfig = data.copyWith(
                                       wheels: [...data.wheels, config],
-                                      allowCustomWheels: data.allowCustomWheels,
                                     );
-                                    _pageConfig = newConfig;
                                   },
                                 ),
                               ),
