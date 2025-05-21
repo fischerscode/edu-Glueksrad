@@ -85,12 +85,44 @@ class _WheelOfFortuneState extends State<WheelOfFortune>
 class WheelPaint extends StatelessWidget {
   final WheelConfig config;
   final double angle;
+  final Function(int section)? onSectionPressed;
+  final int? selectedSection;
 
-  const WheelPaint({super.key, required this.config, required this.angle});
+  const WheelPaint({
+    super.key,
+    required this.config,
+    required this.angle,
+    this.onSectionPressed,
+    this.selectedSection,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return CustomPaint(painter: _WheelPainter(config, angle));
+    final paint = CustomPaint(
+      painter: _WheelPainter(config, angle, selectedSection),
+    );
+
+    if (onSectionPressed != null && config.sections.isNotEmpty) {
+      return GestureDetector(
+        onTapUp: (details) {
+          final RenderBox renderBox = context.findRenderObject() as RenderBox;
+          final Offset localPosition = renderBox.globalToLocal(
+            details.globalPosition,
+          );
+          final double dx = localPosition.dx - renderBox.size.width / 2;
+          final double dy = localPosition.dy - renderBox.size.height / 2;
+          final double angle = atan2(dy, dx) + pi / 2;
+          final (event, eventId, section) = WheelPaint.calculateResult(
+            this.angle - angle / (2 * pi),
+            config,
+          );
+          onSectionPressed!(section);
+        },
+        child: paint,
+      );
+    } else {
+      return paint;
+    }
   }
 
   static (Event event, int eventId, int section) calculateResult(
@@ -151,8 +183,9 @@ class _WheelPainter extends CustomPainter {
   final TextPainter _textPainter = TextPainter(
     textDirection: TextDirection.ltr,
   );
+  final int? selectedSection;
 
-  _WheelPainter(this.config, this.angle);
+  _WheelPainter(this.config, this.angle, this.selectedSection);
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -162,6 +195,15 @@ class _WheelPainter extends CustomPainter {
     final segments = WheelPaint.calculateSegments(config);
 
     final Paint paint = Paint()..style = PaintingStyle.fill;
+
+    canvas.drawCircle(
+      center,
+      radius,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2
+        ..color = Colors.black,
+    );
 
     for (final segment in segments) {
       final paintStart = (angle + segment.start) * 2 * pi - pi / 2;
@@ -189,6 +231,24 @@ class _WheelPainter extends CustomPainter {
       _textPainter.paint(canvas, Offset(x, y));
     }
 
+    for (final (index, segment) in segments.indexed) {
+      final paintStart = (angle + segment.start) * 2 * pi - pi / 2;
+      final segmentSize = (segment.end - segment.start) * 2 * pi;
+      if (index == selectedSection) {
+        canvas.drawArc(
+          Rect.fromCircle(center: center, radius: radius),
+          paintStart,
+          segmentSize,
+          true,
+          Paint()
+            ..style = PaintingStyle.stroke
+            ..strokeJoin = StrokeJoin.round
+            ..strokeWidth = 10
+            ..color = segment.event.color,
+        );
+      }
+    }
+
     final Path pointer = Path()
       ..moveTo(center.dx, center.dy - radius + 18)
       ..lineTo(center.dx - 12, center.dy - radius - 10)
@@ -199,6 +259,8 @@ class _WheelPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _WheelPainter old) {
-    return old.angle != angle || old.config != config;
+    return old.angle != angle ||
+        old.config != config ||
+        old.selectedSection != selectedSection;
   }
 }

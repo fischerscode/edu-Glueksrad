@@ -64,6 +64,13 @@ class _WheelPageState extends State<WheelPage> {
               child: SizedBox(
                 width: 300,
                 height: 300,
+                // child: WheelPaint(
+                //   config: config,
+                //   angle: 1,
+                //   onSectionPressed: (section) {
+                //     print(config.events[config.sections[section].eventId].name);
+                //   },
+                // ),
                 child: WheelOfFortune(
                   config: config,
                   onResult: (event, eventId, section) {
