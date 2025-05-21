@@ -94,26 +94,26 @@ class _MainPageState extends State<MainPage> {
                   crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
                     for (int i = 0; i < data.wheels.length; i++)
-                      Container(
-                        child: InkWell(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => WheelPage(
-                                  config: data.wheels[i],
-                                  onEdited: isTeacher
-                                      ? (config) {
-                                          _pageConfig = data.copyWith(
-                                            wheels: data.wheels.toList()
-                                              ..[i] = config,
-                                          );
-                                        }
-                                      : null,
-                                ),
+                      InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => WheelPage(
+                                config: data.wheels[i],
+                                onEdited: isTeacher
+                                    ? (config) {
+                                        _pageConfig = data.copyWith(
+                                          wheels: data.wheels.toList()
+                                            ..[i] = config,
+                                        );
+                                      }
+                                    : null,
                               ),
-                            );
-                          },
+                            ),
+                          );
+                        },
+                        child: Container(
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: SizedBox.square(
