@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:glueksrad/main_page.dart';
-import 'package:glueksrad/wheel_edit_page.dart';
-
-import 'wheel_page.dart';
 
 void main() {
   runApp(const MyApp());

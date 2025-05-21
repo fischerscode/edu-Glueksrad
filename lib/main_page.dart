@@ -1,12 +1,12 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:download/download.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:glueksrad/wheel/wheel_of_fortune.dart';
 import 'package:http/http.dart' as http;
 
-import 'utils/download.dart';
 import 'wheel/page_config.dart';
 import 'wheel/wheel_config.dart';
 import 'wheel_page.dart';
@@ -61,7 +61,12 @@ class _MainPageState extends State<MainPage> {
               icon: const Icon(Icons.save),
               onPressed: kIsWeb && _pageConfig != null
                   ? () {
-                      saveTextFile(jsonEncode(_pageConfig), 'glueksrad.json');
+                      download(
+                        Stream.fromIterable(
+                          utf8.encode(jsonEncode(_pageConfig)),
+                        ),
+                        'glueksrad.json',
+                      );
                     }
                   : null,
             ),
