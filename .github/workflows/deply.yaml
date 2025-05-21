@@ -1,7 +1,10 @@
 name: Flutter CI
 on:
-  release:
-    types: [published]
+  push:
+    branches:
+      - main
+  # release:
+  #   types: [published]
 jobs:
   web:
     concurrency: web-${{ github.ref }}
