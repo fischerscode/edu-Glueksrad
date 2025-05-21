@@ -102,41 +102,47 @@ class _WheelPageState extends State<WheelPage> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            IntrinsicWidth(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  for (int i = 0; i < config.events.length; i++)
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          '${config.events[i].name}: ',
-                          style: TextStyle(
-                            color: config.events[i].color,
-                            fontSize: 20,
-                          ),
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: IntrinsicWidth(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      for (int i = 0; i < config.events.length; i++)
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              '${config.events[i].name}: ',
+                              style: TextStyle(
+                                color: config.events[i].color,
+                                fontSize: 20,
+                              ),
+                            ),
+                            Text(
+                              '${results.where((eventId) => eventId == i).length}',
+                              style: TextStyle(
+                                color: config.events[i].color,
+                                fontSize: 20,
+                              ),
+                            ),
+                          ],
                         ),
-                        Text(
-                          '${results.where((eventId) => eventId == i).length}',
-                          style: TextStyle(
-                            color: config.events[i].color,
-                            fontSize: 20,
-                          ),
-                        ),
-                      ],
-                    ),
-                  IconButton(
-                    onPressed: () {
-                      setState(() {
-                        results.clear();
-                        widget.saveResults?.call(results);
-                      });
-                    },
-                    icon: Icon(Icons.restart_alt_rounded),
+                      IconButton(
+                        onPressed: () {
+                          setState(() {
+                            results.clear();
+                            widget.saveResults?.call(results);
+                          });
+                        },
+                        icon: Icon(Icons.restart_alt_rounded),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
             ),
             Center(
