@@ -81,168 +81,181 @@ class _MainPageState extends State<MainPage> {
             ),
         ],
       ),
-      body: Builder(
-        builder: (context) {
-          final data = _pageConfig;
-          if (error != null) {
-            return Center(
-              child: Text(
-                'Error: $error',
-                style: const TextStyle(color: Colors.red),
-              ),
-            );
-          } else if (data != null) {
-            return ListView(
-              children: [
-                Wrap(
-                  alignment: WrapAlignment.spaceEvenly,
-                  crossAxisAlignment: WrapCrossAlignment.center,
-                  children: [
-                    for (int i = 0; i < data.wheels.length; i++)
-                      InkWell(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => WheelPage(
-                                config: data.wheels[i],
-                                onEdited: isTeacher
-                                    ? (config) {
-                                        _pageConfig = data.copyWith(
-                                          wheels: data.wheels.toList()
-                                            ..[i] = config,
-                                        );
-                                      }
-                                    : null,
-                                initResults: wheelResults[i],
-                                saveResults: (results) {
-                                  wheelResults[i] = results.toList();
-                                },
-                              ),
-                            ),
-                          );
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: SizedBox.square(
-                            dimension: 200,
-                            child: WheelPaint(config: data.wheels[i], angle: 0),
-                          ),
-                        ),
-                      ),
-                    if (isTeacher)
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: FloatingActionButton(
-                          onPressed: () async {
-                            final result = await Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => WheelEditPage(
-                                  config: WheelConfig(
-                                    events: [],
-                                    sections: [],
-                                    spinDuration: initSpinDuration,
-                                  ),
-                                ),
-                              ),
-                            );
-                            if (result != null) {
-                              _pageConfig = data.copyWith(
-                                wheels: [...data.wheels, result],
-                              );
-                              wheelResults.add([]);
-                            }
-                          },
-                          child: Icon(Icons.add),
-                        ),
-                      ),
-                  ],
+      body: SafeArea(
+        child: Builder(
+          builder: (context) {
+            final data = _pageConfig;
+            if (error != null) {
+              return Center(
+                child: Text(
+                  'Error: $error',
+                  style: const TextStyle(color: Colors.red),
                 ),
-                if (isTeacher)
-                  SwitchListTile(
-                    title: const Text('Eigene Glücksräder erlauben'),
-                    value: data.allowCustomWheels,
-                    onChanged: (bool value) {
-                      final config = PageConfig(
-                        wheels: data.wheels,
-                        allowCustomWheels: value,
-                      );
-                      _pageConfig = config;
-                    },
-                  ),
-                if (!isTeacher && data.allowCustomWheels)
+              );
+            } else if (data != null) {
+              return ListView(
+                children: [
                   Wrap(
                     alignment: WrapAlignment.spaceEvenly,
                     crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
-                      for (int i = 0; i < customWheels.length; i++)
+                      for (int i = 0; i < data.wheels.length; i++)
                         InkWell(
                           onTap: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder: (context) => WheelPage(
-                                  config: customWheels[i],
-                                  onEdited: (config) {
-                                    setState(() {
-                                      customWheels[i] = config;
-                                    });
-                                  },
-                                  initResults: customWheelsResults[i],
+                                  config: data.wheels[i],
+                                  onEdited: isTeacher
+                                      ? (config) {
+                                          _pageConfig = data.copyWith(
+                                            wheels: data.wheels.toList()
+                                              ..[i] = config,
+                                          );
+                                        }
+                                      : null,
+                                  initResults: wheelResults[i],
                                   saveResults: (results) {
-                                    customWheelsResults[i] = results.toList();
+                                    wheelResults[i] = results.toList();
                                   },
                                 ),
                               ),
                             );
                           },
-                          child: SizedBox.square(
-                            dimension: 150,
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: SizedBox.square(
+                              dimension: 200,
                               child: WheelPaint(
-                                config: customWheels[i],
+                                config: data.wheels[i],
                                 angle: 0,
                               ),
                             ),
                           ),
                         ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: FloatingActionButton(
-                          child: const Icon(Icons.add),
-                          onPressed: () async {
-                            final result = await Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => WheelEditPage(
-                                  config: WheelConfig(
-                                    events: [],
-                                    sections: [],
-                                    spinDuration: initSpinDuration,
+                      if (isTeacher)
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: FloatingActionButton(
+                            onPressed: () async {
+                              final result = await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => WheelEditPage(
+                                    config: WheelConfig(
+                                      events: [],
+                                      sections: [],
+                                      spinDuration: initSpinDuration,
+                                    ),
                                   ),
                                 ),
-                              ),
-                            );
-
-                            if (result != null) {
-                              setState(() {
-                                customWheels.add(result);
-                                customWheelsResults.add([]);
-                              });
-                            }
-                          },
+                              );
+                              if (result != null) {
+                                _pageConfig = data.copyWith(
+                                  wheels: [...data.wheels, result],
+                                );
+                                wheelResults.add([]);
+                              }
+                            },
+                            child: Icon(Icons.add),
+                          ),
                         ),
-                      ),
                     ],
                   ),
-              ],
-            );
-          } else {
-            return const Center(child: CircularProgressIndicator());
-          }
-        },
+                  if (isTeacher)
+                    SwitchListTile(
+                      title: const Text('Eigene Glücksräder erlauben'),
+                      value: data.allowCustomWheels,
+                      onChanged: (bool value) {
+                        final config = PageConfig(
+                          wheels: data.wheels,
+                          allowCustomWheels: value,
+                        );
+                        _pageConfig = config;
+                      },
+                    ),
+                  if (!isTeacher && data.allowCustomWheels)
+                    Padding(
+                      padding: const EdgeInsets.only(left: 8.0),
+                      child: Text(
+                        'Eigene Glücksräder',
+                        style: Theme.of(context).textTheme.headlineSmall,
+                      ),
+                    ),
+                  if (!isTeacher && data.allowCustomWheels)
+                    Wrap(
+                      alignment: WrapAlignment.spaceEvenly,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: [
+                        for (int i = 0; i < customWheels.length; i++)
+                          InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => WheelPage(
+                                    config: customWheels[i],
+                                    onEdited: (config) {
+                                      setState(() {
+                                        customWheels[i] = config;
+                                      });
+                                    },
+                                    initResults: customWheelsResults[i],
+                                    saveResults: (results) {
+                                      customWheelsResults[i] = results.toList();
+                                    },
+                                  ),
+                                ),
+                              );
+                            },
+                            child: SizedBox.square(
+                              dimension: 150,
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: WheelPaint(
+                                  config: customWheels[i],
+                                  angle: 0,
+                                ),
+                              ),
+                            ),
+                          ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: FloatingActionButton(
+                            child: const Icon(Icons.add),
+                            onPressed: () async {
+                              final result = await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => WheelEditPage(
+                                    config: WheelConfig(
+                                      events: [],
+                                      sections: [],
+                                      spinDuration: initSpinDuration,
+                                    ),
+                                  ),
+                                ),
+                              );
+
+                              if (result != null) {
+                                setState(() {
+                                  customWheels.add(result);
+                                  customWheelsResults.add([]);
+                                });
+                              }
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                ],
+              );
+            } else {
+              return const Center(child: CircularProgressIndicator());
+            }
+          },
+        ),
       ),
     );
   }
