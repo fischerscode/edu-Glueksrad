@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:glueksrad/wheel/wheel_config.dart';
 import 'package:glueksrad/wheel/wheel_of_fortune.dart';
@@ -26,6 +28,7 @@ class _WheelPageState extends State<WheelPage> {
   List<int> results = [];
 
   late WheelConfig config;
+  final Random _random = Random();
 
   @override
   void initState() {
@@ -139,7 +142,7 @@ class _WheelPageState extends State<WheelPage> {
               //   config: config,
               //   angle: 1,
               //   onSectionPressed: (section) {
-              //     print(config.events[config.sections[section].eventId].name);
+              //     // print(config.events[config.sections[section].eventId].name);
               //   },
               // ),
               child: WheelOfFortune(
@@ -153,6 +156,67 @@ class _WheelPageState extends State<WheelPage> {
                   } else {
                     results.add(eventId);
                     widget.saveResults?.call(results);
+                  }
+                },
+                randomModifier: () {
+                  final total = config.totalSize;
+                  final eventSections = config.events
+                      .map(((e) => <({double start, double end})>[]))
+                      .toList();
+                  var start = 0.0;
+                  for (final section in config.sections) {
+                    final sectionSize = section.size / config.totalSize;
+                    eventSections[section.eventId].add((
+                      start: start,
+                      end: start + sectionSize,
+                    ));
+                    start += sectionSize;
+                  }
+
+                  final propabilities = eventSections
+                      .map(
+                        (sections) => sections
+                            .map((section) => section.end - section.start)
+                            .reduce((a, b) => a + b),
+                      )
+                      .toList();
+
+                  final totalSpins = results.length;
+                  final expected = propabilities
+                      .map((e) => e * totalSpins)
+                      .toList();
+                  final actual = List.generate(
+                    expected.length,
+                    (index) => results.where((r) => r == index).length,
+                  );
+
+                  // print('Expected: $expected');
+                  // print('Actual: $actual');
+
+                  final tooFew = expected.indexed
+                      .where(
+                        (expection) => expection.$2 - actual[expection.$1] >= 1,
+                      )
+                      .map((e) => e.$1)
+                      .toList();
+                  if (tooFew.isNotEmpty) {
+                    // print('Too few: $tooFew');
+                    final force = tooFew[_random.nextInt(tooFew.length)];
+                    // print('Force: $force');
+                    final targetSection =
+                        eventSections[force][_random.nextInt(
+                          eventSections[force].length,
+                        )];
+                    // print('targetSection: $targetSection');
+                    final targetAngle =
+                        -(targetSection.start +
+                            (targetSection.end - targetSection.start) *
+                                _random.nextDouble()) +
+                        3;
+                    // print('targetAngle: $targetAngle');
+                    return targetAngle;
+                  } else {
+                    return Random().nextDouble() + 2;
                   }
                 },
               ),

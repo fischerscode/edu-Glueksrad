@@ -6,12 +6,14 @@ import 'package:glueksrad/wheel/wheel_config.dart';
 class WheelOfFortune extends StatefulWidget {
   final WheelConfig config;
 
+  final double Function()? randomModifier;
   final void Function(Event event, int eventId, int section) onResult;
 
   const WheelOfFortune({
     super.key,
     required this.config,
     required this.onResult,
+    this.randomModifier,
   });
 
   @override
@@ -47,10 +49,16 @@ class _WheelOfFortuneState extends State<WheelOfFortune>
 
   /// Spin the wheel with a random amount of rotation.
   void spin() {
-    final double randomSpin = _random.nextDouble() + 2;
+    final double targetAngle;
+    if (widget.randomModifier != null) {
+      targetAngle = _currentAngle.ceil() + widget.randomModifier!();
+      // print('Target angle: $targetAngle');
+    } else {
+      targetAngle = _currentAngle + _random.nextDouble() + 2;
+    }
     _animation = Tween<double>(
       begin: _currentAngle,
-      end: _currentAngle + randomSpin,
+      end: targetAngle,
     ).animate(CurvedAnimation(parent: _controller, curve: Curves.decelerate));
     _controller
       ..duration = widget.config.spinDuration
@@ -60,6 +68,7 @@ class _WheelOfFortuneState extends State<WheelOfFortune>
 
   /// Determine which segment the wheel stopped on.
   void _calculateResult() {
+    // print('Current angle: $_currentAngle');
     final (Event event, int eventId, int section) = WheelPaint.calculateResult(
       _currentAngle,
       widget.config,
