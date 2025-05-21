@@ -70,7 +70,7 @@ class _MainPageState extends State<MainPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Glücksrad${isTeacher ? ' (Lehrer)' : ''}'),
+        title: Text('Glücksräder${isTeacher ? ' (Lehrer)' : ''}'),
         actions: [
           if (isTeacher)
             IconButton(

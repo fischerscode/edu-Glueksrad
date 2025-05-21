@@ -67,7 +67,7 @@ class _WheelPageState extends State<WheelPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Glücksrad'),
+        title: const Text('Glücksrad drehen'),
         actions: [
           if (widget.onEdited != null)
             IconButton(
