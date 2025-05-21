@@ -1,0 +1,235 @@
+import 'dart:async';
+import 'dart:convert';
+
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:glueksrad/wheel/wheel_of_fortune.dart';
+import 'package:http/http.dart' as http;
+
+import 'utils/download.dart';
+import 'wheel/page_config.dart';
+import 'wheel/wheel_config.dart';
+import 'wheel_page.dart';
+
+class MainPage extends StatefulWidget {
+  const MainPage({super.key});
+
+  @override
+  State<MainPage> createState() => _MainPageState();
+}
+
+class _MainPageState extends State<MainPage> {
+  late final bool isTeacher;
+  final StreamController<PageConfig> pageConfig = StreamController();
+  PageConfig? _pageConfig;
+  final List<WheelConfig> customWheels = [];
+
+  @override
+  void initState() {
+    final fragmentParams = Uri.base.fragment.isNotEmpty
+        ? Uri.splitQueryString(Uri.base.fragment)
+        : <String, String>{};
+    isTeacher = fragmentParams['teacher'] == 'true';
+    final initConfig = fragmentParams['config'];
+
+    if (initConfig != null) {
+      http.get(Uri.parse(initConfig)).then((response) {
+        if (response.statusCode == 200) {
+          final config = PageConfig.fromJson(jsonDecode(response.body));
+          pageConfig.add(config);
+          _pageConfig = config;
+        } else {
+          pageConfig.addError('Failed to load config');
+        }
+      });
+    } else {
+      final config = PageConfig(wheels: [], allowCustomWheels: true);
+      pageConfig.add(config);
+      _pageConfig = config;
+    }
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Glücksrad${isTeacher ? ' (Lehrer)' : ''}'),
+        actions: [
+          if (isTeacher)
+            IconButton(
+              icon: const Icon(Icons.save),
+              onPressed: kIsWeb && _pageConfig != null
+                  ? () {
+                      saveTextFile(jsonEncode(_pageConfig), 'glueksrad.json');
+                    }
+                  : null,
+            ),
+        ],
+      ),
+      body: StreamBuilder(
+        stream: pageConfig.stream,
+        builder: (context, snapshot) {
+          final data = snapshot.data;
+          final error = snapshot.error;
+
+          if (error != null) {
+            return Center(
+              child: Text(
+                'Error: $error',
+                style: const TextStyle(color: Colors.red),
+              ),
+            );
+          } else if (data != null) {
+            return ListView(
+              children: [
+                Wrap(
+                  alignment: WrapAlignment.spaceEvenly,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    for (int i = 0; i < data.wheels.length; i++)
+                      InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => WheelPage(
+                                config: data.wheels[i],
+                                onEdited: isTeacher
+                                    ? (config) {
+                                        setState(() {
+                                          data.wheels[i] = config;
+                                        });
+                                      }
+                                    : null,
+                              ),
+                            ),
+                          );
+                        },
+                        child: Container(
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: SizedBox.square(
+                              dimension: 200,
+                              child: WheelPaint(
+                                config: data.wheels[i],
+                                angle: 0,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    if (isTeacher)
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: FloatingActionButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => WheelPage(
+                                  config: WheelConfig(
+                                    events: [],
+                                    sections: [],
+                                    spinDuration: const Duration(seconds: 5),
+                                  ),
+                                  onEdited: (config) {
+                                    final newConfig = PageConfig(
+                                      wheels: [...data.wheels, config],
+                                      allowCustomWheels: data.allowCustomWheels,
+                                    );
+                                    pageConfig.add(newConfig);
+                                    _pageConfig = newConfig;
+                                  },
+                                ),
+                              ),
+                            );
+                          },
+                          child: Icon(Icons.add),
+                        ),
+                      ),
+                  ],
+                ),
+                if (isTeacher)
+                  SwitchListTile(
+                    title: const Text('Eigene Glücksräder erlauben'),
+                    value: data.allowCustomWheels,
+                    onChanged: (bool value) {
+                      final config = PageConfig(
+                        wheels: data.wheels,
+                        allowCustomWheels: value,
+                      );
+                      pageConfig.add(config);
+                      _pageConfig = config;
+                    },
+                  ),
+                if (!isTeacher && data.allowCustomWheels)
+                  Wrap(
+                    alignment: WrapAlignment.spaceEvenly,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: [
+                      for (int i = 0; i < customWheels.length; i++)
+                        InkWell(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => WheelPage(
+                                  config: customWheels[i],
+                                  onEdited: (config) {
+                                    setState(() {
+                                      customWheels[i] = config;
+                                    });
+                                  },
+                                ),
+                              ),
+                            );
+                          },
+                          child: SizedBox.square(
+                            dimension: 150,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: WheelPaint(
+                                config: customWheels[i],
+                                angle: 0,
+                              ),
+                            ),
+                          ),
+                        ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: FloatingActionButton(
+                          child: const Icon(Icons.add),
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => WheelPage(
+                                  config: WheelConfig(
+                                    events: [],
+                                    sections: [],
+                                    spinDuration: const Duration(seconds: 5),
+                                  ),
+                                  onEdited: (config) {
+                                    setState(() {
+                                      customWheels.add(config);
+                                    });
+                                  },
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+              ],
+            );
+          } else {
+            return const Center(child: CircularProgressIndicator());
+          }
+        },
+      ),
+    );
+  }
+}

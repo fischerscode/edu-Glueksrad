@@ -6,21 +6,82 @@ import 'package:glueksrad/wheel/wheel_config.dart';
 import 'package:glueksrad/wheel/wheel_of_fortune.dart';
 
 class WheelEditPage extends StatefulWidget {
-  const WheelEditPage({super.key});
+  const WheelEditPage({super.key, required this.config});
+
+  final WheelConfig config;
 
   @override
   State<WheelEditPage> createState() => _WheelEditPageState();
 }
 
 class _WheelEditPageState extends State<WheelEditPage> {
-  final _builder = ConfigBuilder();
+  var _builder = ConfigBuilder();
   int? _selectedSection;
 
   final nameEditingController = TextEditingController();
 
   @override
+  void initState() {
+    _builder = ConfigBuilder(widget.config);
+    super.initState();
+  }
+
+  @override
+  void didUpdateWidget(WheelEditPage oldWidget) {
+    if (oldWidget.config != widget.config) {
+      _builder = ConfigBuilder(widget.config);
+    }
+    super.didUpdateWidget(oldWidget);
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('Glücksrad bearbeiten'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            showDialog(
+              context: context,
+              builder: (context) => AlertDialog(
+                title: const Text('Änderungen speichern?'),
+                content: const Text('Möchtest du die Änderungen speichern?'),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      Navigator.pop(context);
+                    },
+                    child: const Text('Nicht speichern'),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      Navigator.pop(context, _builder.build());
+                    },
+                    child: const Text('Speichern'),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: const Text('Abbrechen'),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.save),
+            onPressed: () {
+              Navigator.pop(context, _builder.build());
+            },
+          ),
+        ],
+      ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
