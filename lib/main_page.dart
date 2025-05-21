@@ -113,16 +113,11 @@ class _MainPageState extends State<MainPage> {
                             ),
                           );
                         },
-                        child: Container(
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: SizedBox.square(
-                              dimension: 200,
-                              child: WheelPaint(
-                                config: data.wheels[i],
-                                angle: 0,
-                              ),
-                            ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: SizedBox.square(
+                            dimension: 200,
+                            child: WheelPaint(config: data.wheels[i], angle: 0),
                           ),
                         ),
                       ),
