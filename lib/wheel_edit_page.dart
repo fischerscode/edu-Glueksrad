@@ -1,7 +1,6 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:glueksrad/utils/maybe_hero.dart';
 import 'package:glueksrad/wheel/wheel_config.dart';
 import 'package:glueksrad/wheel/wheel_of_fortune.dart';
