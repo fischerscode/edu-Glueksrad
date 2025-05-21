@@ -193,16 +193,56 @@ class _WheelPageState extends State<WheelPage> {
                   // print('Expected: $expected');
                   // print('Actual: $actual');
 
+                  // final tooFew = expected.indexed
+                  //     .where(
+                  //       (expection) => expection.$2 - actual[expection.$1] >= 1,
+                  //     )
+                  //     .map((e) => e.$1)
+                  //     .toList();
                   final tooFew = expected.indexed
                       .where(
-                        (expection) => expection.$2 - actual[expection.$1] >= 1,
+                        (expection) =>
+                            expection.$2 - actual[expection.$1] >=
+                            0.7, // too few
                       )
                       .map((e) => e.$1)
                       .toList();
-                  if (tooFew.isNotEmpty) {
+                  final notTooMany = expected.indexed
+                      .where(
+                        (expection) =>
+                            actual[expection.$1] - expection.$2 <=
+                            1.5, // not too many
+                      )
+                      .map((e) => e.$1)
+                      .toList();
+                  final candidates = [...tooFew, ...tooFew, ...notTooMany];
+                  if (candidates.isNotEmpty) {
                     // print('Too few: $tooFew');
-                    final force = tooFew[_random.nextInt(tooFew.length)];
+                    // print('Candidates: $candidates');
+                    final candidatesTotalAngle = candidates
+                        .map(
+                          (e) => eventSections[e]
+                              .map((section) => section.end - section.start)
+                              .reduce((a, b) => a + b),
+                        )
+                        .reduce((a, b) => a + b);
+
+                    var forceAngle =
+                        _random.nextDouble() * candidatesTotalAngle;
+                    int? force;
+                    for (int i = 0; i < candidates.length; i++) {
+                      final candidateAngle = eventSections[candidates[i]]
+                          .map((section) => section.end - section.start)
+                          .reduce((a, b) => a + b);
+                      if (forceAngle <= candidateAngle) {
+                        force = candidates[i];
+                        break;
+                      }
+                      forceAngle -= candidateAngle;
+                    }
                     // print('Force: $force');
+                    force ??= candidates[0];
+
                     final targetSection =
                         eventSections[force][_random.nextInt(
                           eventSections[force].length,
